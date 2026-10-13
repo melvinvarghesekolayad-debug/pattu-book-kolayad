@@ -1,0 +1,48 @@
+{
+  "entities": {
+    "WorkLog": {
+      "title": "Work Log Entry",
+      "description": "Details of a worker's daily job, site, and expenses.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "workerNumber": { "type": "number" },
+        "workerName": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "workerPhone": { "type": "string", "maxLength": 20 },
+        "submittedBy": { "type": "string", "maxLength": 100 },
+        "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "minLength": 10, "maxLength": 10 },
+        "siteName": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "workDescription": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "thachCount": { "type": "number" },
+        "vehicleRent": { "type": "number" },
+        "foodExpense": { "type": "number" },
+        "toolsRent": { "type": "number" },
+        "otherExpense": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["workerNumber", "workerName", "date", "siteName", "workDescription", "vehicleRent", "foodExpense", "toolsRent", "otherExpense", "createdAt", "updatedAt"]
+    },
+    "Settings": {
+      "title": "Application Settings",
+      "description": "Configuration settings for Telegram integration and owner controls.",
+      "type": "object",
+      "properties": {
+        "telegramBotToken": { "type": "string", "maxLength": 100 },
+        "ownerChatId": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["telegramBotToken", "ownerChatId", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/work_logs/{logId}": {
+      "schema": "WorkLog",
+      "description": "Collection of worker daily reports and expense details."
+    },
+    "/settings/{settingsId}": {
+      "schema": "Settings",
+      "description": "Global config storage for Telegram integration."
+    }
+  }
+}

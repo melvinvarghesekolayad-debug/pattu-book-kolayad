@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // WorkLog validation helper
+    function isValidWorkLog(data) {
+      return data.keys().hasAll([
+        'workerNumber', 'workerName', 'date', 'siteName', 
+        'workDescription', 'vehicleRent', 'foodExpense', 
+        'toolsRent', 'otherExpense', 'createdAt', 'updatedAt'
+      ]) &&
+      data.workerNumber is int && data.workerNumber >= 1 && data.workerNumber <= 50 &&
+      data.workerName is string && data.workerName.size() >= 1 && data.workerName.size() <= 100 &&
+      data.date is string && data.date.matches('^\\d{4}-\\d{2}-\\d{2}$') &&
+      data.siteName is string && data.siteName.size() >= 1 && data.siteName.size() <= 200 &&
+      data.workDescription is string && data.workDescription.size() >= 1 && data.workDescription.size() <= 1000 &&
+      (!('thachCount' in data) || (data.thachCount is int || data.thachCount is float) && data.thachCount >= 0) &&
+      (data.vehicleRent is int || data.vehicleRent is float) && data.vehicleRent >= 0 &&
+      (data.foodExpense is int || data.foodExpense is float) && data.foodExpense >= 0 &&
+      (data.toolsRent is int || data.toolsRent is float) && data.toolsRent >= 0 &&
+      (data.otherExpense is int || data.otherExpense is float) && data.otherExpense >= 0 &&
+      data.createdAt == request.time &&
+      data.updatedAt == request.time;
+    }
+
+    // Settings validation helper
+    function isValidSettings(data) {
+      return data.keys().hasAll(['telegramBotToken', 'ownerChatId', 'updatedAt']) &&
+             data.telegramBotToken is string && data.telegramBotToken.size() <= 100 &&
+             data.ownerChatId is string && data.ownerChatId.size() <= 50 &&
+             data.updatedAt == request.time;
+    }
+
+    // Rules for WorkLogs
+    match /work_logs/{logId} {
+      allow read, create, update, delete: if true;
+    }
+
+    // Rules for Settings
+    match /settings/{settingsId} {
+      allow read: if true;
+      allow write: if isValidId(settingsId) && isValidSettings(incoming());
+    }
+
+    // Rules for Public Service & Callback Requests
+    match /service_requests/{requestId} {
+      allow read, create, update, delete: if true;
+    }
+  }
+}

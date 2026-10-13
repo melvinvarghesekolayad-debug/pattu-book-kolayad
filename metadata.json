@@ -1,0 +1,6 @@
+{
+  "name": "WorkLog Pro",
+  "description": "തൊഴിലാളികൾക്കും മുതലാളിമാർക്കും വേണ്ടിയുള്ള വർക്ക് & എക്സ്പെൻസ് മാനേജർ ആപ്പ്. (Work & Expense Manager with Telegram Bot integration for workers and business owners).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
